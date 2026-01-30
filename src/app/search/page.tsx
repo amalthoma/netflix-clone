@@ -1,8 +1,9 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
 
 export default function SearchPage() {
   const params = useSearchParams();
@@ -25,9 +26,8 @@ export default function SearchPage() {
 
   return (
     <main className="pt-24 px-6">
-    <Navbar />
       <h1 className="text-2xl text-white mb-6">
-        Search Results for “{query}”
+        Search results for “{query}”
       </h1>
 
       {movies.length === 0 ? (
@@ -35,15 +35,11 @@ export default function SearchPage() {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           {movies.map((movie) => (
-            <div key={movie.id} className="cursor-pointer">
-              <img
-                src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
-                className="rounded hover:scale-105 transition"
-              />
-              <p className="text-sm text-white mt-1">
-                {movie.title}
-              </p>
-            </div>
+            <img
+              key={movie.id}
+              src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
+              className="rounded hover:scale-105 transition"
+            />
           ))}
         </div>
       )}
