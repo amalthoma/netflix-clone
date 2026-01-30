@@ -1,73 +1,99 @@
 import { fetchFromTMDB } from "../../lib/tmdb";
+import Link from "next/link";
 
-// 1. Define the props as a Promise
 interface Props {
   params: Promise<{ id: string }>;
 }
+
 export default async function MoviePage({ params }: Props) {
-    // 2. Await the params to get the actual ID
   const { id } = await params;
-  const movie = await fetchFromTMDB(`/movie/${id}`);
-  const videos = await fetchFromTMDB(`/movie/${id}/videos`);
-  const similar = await fetchFromTMDB(`/movie/${id}/similar`);
+  
+  // Parallel fetching for better performance
+  const [movie, videos, similar] = await Promise.all([
+    fetchFromTMDB(`/movie/${id}`),
+    fetchFromTMDB(`/movie/${id}/videos`),
+    fetchFromTMDB(`/movie/${id}/similar`)
+  ]);
 
   const trailer = videos.results.find(
     (v: any) => v.type === "Trailer" && v.site === "YouTube"
   );
 
   return (
-    <div className="bg-black text-white min-h-screen p-8">
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Poster */}
-        <img
-          src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-          className="w-[300px] rounded"
-          alt={movie.title}
-        />
+    <div className="bg-black text-white min-h-screen p-4 md:p-12 lg:p-20 pt-24">
+      {/* Main Info Section */}
+      <div className="flex flex-col md:flex-row items-center md:items-start gap-10">
+        
+        {/* Poster - Centered on mobile, left-aligned on desktop */}
+        <div className="relative w-full max-w-[280px] md:max-w-[350px] flex-shrink-0 shadow-2xl shadow-white/5">
+          <img
+            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+            className="w-full rounded-lg object-cover border border-white/10"
+            alt={movie.title}
+          />
+        </div>
 
-        {/* Info */}
-        <div>
-          <h1 className="text-4xl font-bold">{movie.title}</h1>
-          <p className="text-gray-400 mt-2">{movie.release_date}</p>
-          <p className="mt-4 max-w-2xl">{movie.overview}</p>
+        {/* Text Details */}
+        <div className="flex-1 text-center md:text-left">
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">
+            {movie.title}
+          </h1>
+          
+          <div className="flex items-center justify-center md:justify-start gap-4 mt-4 text-gray-400 text-sm md:text-base">
+            <span>{movie.release_date?.split('-')[0]}</span>
+            <span className="border px-2 py-0.5 rounded text-xs border-gray-600">HD</span>
+            <span className="text-yellow-500 font-bold">⭐ {movie.vote_average?.toFixed(1)}</span>
+          </div>
 
-          <p className="mt-4">
-            ⭐ Rating: {movie.vote_average.toFixed(1)}
+          <p className="mt-6 text-gray-300 leading-relaxed max-w-3xl text-sm md:text-lg">
+            {movie.overview}
           </p>
 
           {trailer && (
             <a
-              href={`#trailer`}
-              className="inline-block mt-6 bg-red-600 px-6 py-2 rounded"
+              href="#trailer"
+              className="inline-flex items-center justify-center mt-8 bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-md font-bold transition-all w-full md:w-auto gap-2"
             >
-              ▶ Watch Trailer
+              <span>▶</span> Watch Trailer
             </a>
           )}
         </div>
       </div>
 
-      {/* Trailer */}
+      {/* Trailer Section */}
       {trailer && (
-        <div id="trailer" className="mt-16">
-          <h2 className="text-2xl mb-4">Trailer</h2>
-          <iframe
-            className="w-full aspect-video rounded"
-            src={`https://www.youtube.com/embed/${trailer.key}`}
-            allowFullScreen
-          />
+        <div id="trailer" className="mt-20 scroll-mt-24">
+          <h2 className="text-xl md:text-3xl font-bold mb-6 border-l-4 border-red-600 pl-4">
+            Official Trailer
+          </h2>
+          <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl">
+            <iframe
+              className="absolute top-0 left-0 w-full h-full"
+              src={`https://www.youtube.com/embed/${trailer.key}?autoplay=0&rel=0`}
+              allowFullScreen
+            />
+          </div>
         </div>
       )}
 
-      {/* Similar Movies */}
-      <div className="mt-16">
-        <h2 className="text-2xl mb-4">More Like This</h2>
-        <div className="flex gap-4 overflow-x-scroll">
-          {similar.results.map((movie: any) => (
-            <img
-              key={movie.id}
-              src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
-              className="w-[180px] rounded hover:scale-110 transition"
-            />
+      {/* Similar Movies Section */}
+      <div className="mt-20 mb-10">
+        <h2 className="text-xl md:text-3xl font-bold mb-6 border-l-4 border-red-600 pl-4">
+          More Like This
+        </h2>
+        <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide snap-x">
+          {similar.results.filter((m: any) => m.poster_path).map((movie: any) => (
+            <Link 
+              key={movie.id} 
+              href={`/movie/${movie.id}`}
+              className="flex-none w-[140px] md:w-[200px] snap-start"
+            >
+              <img
+                src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
+                className="w-full h-auto rounded-md hover:scale-105 transition-transform duration-300 cursor-pointer object-cover aspect-[2/3]"
+                alt={movie.title}
+              />
+            </Link>
           ))}
         </div>
       </div>
