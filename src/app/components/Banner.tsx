@@ -34,37 +34,42 @@ export default function Banner() {
     if (trailer) setTrailerKey(trailer.key);
   };
 
-  if (!movie) return null;
+  if (!movie) return <div className="h-[50vh] lg:h-[85vh] bg-black animate-pulse" />;
 
   return (
     <>
       <div
-        className="relative h-[85vh] bg-cover bg-center text-white"
+        className="relative h-[60vh] sm:h-[70vh] lg:h-[85vh] w-full bg-cover bg-top md:bg-center text-white flex flex-col justify-center md:justify-end"
         style={{
           backgroundImage: `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`,
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+        {/* Gradients: Bottom fade for everyone, Left fade for Desktop readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+        <div className="hidden md:block absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-transparent" />
 
-        <div className="relative z-10 px-10 pt-40 max-w-2xl">
-          <h1 className="text-5xl font-extrabold">{movie.title}</h1>
-          <p className="mt-4 text-gray-300 line-clamp-3">
+        <div className="relative z-10 px-6 md:px-12 pb-10 md:pb-20 max-w-xl lg:max-w-2xl">
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold drop-shadow-md">
+            {movie.title}
+          </h1>
+          
+          <p className="mt-4 text-sm md:text-lg text-gray-200 line-clamp-3 md:line-clamp-4 drop-shadow">
             {movie.overview}
           </p>
 
-          <div className="mt-6 flex gap-4">
+          <div className="mt-6 flex flex-row gap-3 md:gap-4">
             {/* PLAY BUTTON */}
             <button
               onClick={playTrailer}
-              className="bg-white text-black px-6 py-2 rounded hover:bg-gray-300 transition"
+              className="flex-1 md:flex-none flex items-center justify-center bg-white text-black px-5 md:px-8 py-2 rounded font-bold hover:bg-gray-300 transition text-sm md:text-base"
             >
-              ▶ Play
+              <span className="mr-2">▶</span> Play
             </button>
 
             {/* MORE INFO BUTTON */}
             <button
               onClick={() => router.push(`/movie/${movie.id}`)}
-              className="bg-gray-700/70 px-6 py-2 rounded hover:bg-gray-600 transition"
+              className="flex-1 md:flex-none flex items-center justify-center bg-gray-500/70 text-white px-5 md:px-8 py-2 rounded font-bold hover:bg-gray-600 transition backdrop-blur-md text-sm md:text-base"
             >
               More Info
             </button>
