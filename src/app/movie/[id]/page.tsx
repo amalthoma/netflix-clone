@@ -1,5 +1,7 @@
 import { fetchFromTMDB } from "../../lib/tmdb";
 import Link from "next/link";
+// Import the new button component
+import WatchTrailerButton from "../../components/WatchTrailerButton"; 
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -8,7 +10,6 @@ interface Props {
 export default async function MoviePage({ params }: Props) {
   const { id } = await params;
   
-  // Parallel fetching for better performance
   const [movie, videos, similar] = await Promise.all([
     fetchFromTMDB(`/movie/${id}`),
     fetchFromTMDB(`/movie/${id}/videos`),
@@ -24,7 +25,7 @@ export default async function MoviePage({ params }: Props) {
       {/* Main Info Section */}
       <div className="flex flex-col md:flex-row items-center md:items-start gap-10">
         
-        {/* Poster - Centered on mobile, left-aligned on desktop */}
+        {/* Poster */}
         <div className="relative w-full max-w-[280px] md:max-w-[350px] flex-shrink-0 shadow-2xl shadow-white/5">
           <img
             src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -49,32 +50,13 @@ export default async function MoviePage({ params }: Props) {
             {movie.overview}
           </p>
 
-          {trailer && (
-            <a
-              href="#trailer"
-              className="inline-flex items-center justify-center mt-8 bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-md font-bold transition-all w-full md:w-auto gap-2"
-            >
-              <span>▶</span> Watch Trailer
-            </a>
-          )}
+          {/* 🔴 REPLACED: Use the new Client Component here */}
+          {trailer && <WatchTrailerButton trailerId={trailer.key} />}
+          
         </div>
       </div>
 
-      {/* Trailer Section */}
-      {trailer && (
-        <div id="trailer" className="mt-20 scroll-mt-24">
-          <h2 className="text-xl md:text-3xl font-bold mb-6 border-l-4 border-red-600 pl-4">
-            Official Trailer
-          </h2>
-          <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl">
-            <iframe
-              className="absolute top-0 left-0 w-full h-full"
-              src={`https://www.youtube.com/embed/${trailer.key}?autoplay=0&rel=0`}
-              allowFullScreen
-            />
-          </div>
-        </div>
-      )}
+      {/* 🔴 REMOVED: The 'iframe' section is gone. The button handles it now. */}
 
       {/* Similar Movies Section */}
       <div className="mt-20 mb-10">

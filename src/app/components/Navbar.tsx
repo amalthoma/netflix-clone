@@ -32,7 +32,7 @@ export default function Navbar() {
           <Link href="/" className="text-white">Home</Link>
           <Link href="/movies" className="text-white">Movies</Link>
           <Link href="/my-list" className="text-white">My List</Link>
-
+          <Link href="/malayalam" className="text-white">Malayalam</Link>
           <form onSubmit={handleSearch}>
             <input
               type="text"
@@ -65,6 +65,10 @@ export default function Navbar() {
           <Link href="/my-list" className="block text-white" onClick={() => setMenuOpen(false)}>
             My List
           </Link>
+          <Link href="/malayalam" className="block text-white" onClick={() => setMenuOpen(false)}>
+            Malayalam
+          </Link>
+        
 
           <form onSubmit={handleSearch}>
             <input
